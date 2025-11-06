@@ -2,6 +2,7 @@ import { getRentDueDate } from "./helpers/getRentDueDate";
 import { calculateProRatedRent } from "./helpers/calculateProRatedRent";
 import { calculateRentChange } from "./helpers/calculateRentChange";
 import { formatCurrency } from "./helpers/formatCurrency";
+import { getNextMonthDate } from "./helpers/getNextMonthDate";
 
 export type MonthlyRentRecord = {
   vacancy: boolean;
@@ -46,13 +47,11 @@ export function calculateMonthlyRent(
       dayOfMonthRentDue
     );
 
-    // Se o vencimento caiu antes do início da janela, pula pro próximo mês
     if (rentDueDate < windowStartDate) {
       currentDate = getNextMonthDate(currentDate);
       continue;
     }
 
-    // Se o vencimento passou do fim da janela, encerra
     if (rentDueDate > windowEndDate) break;
 
     const vacancy = rentDueDate < leaseStartDate;
@@ -82,7 +81,11 @@ export function calculateMonthlyRent(
       rentDueDate.getMonth() === leaseStartDate.getMonth() &&
       rentDueDate.getFullYear() === leaseStartDate.getFullYear()
     ) {
-      rentAmount = calculateProRatedRent(currentRent, leaseStartDate, rentDueDate);
+      rentAmount = calculateProRatedRent(
+        currentRent,
+        leaseStartDate,
+        rentDueDate
+      );
     }
 
     rentAmount = formatCurrency(rentAmount);
@@ -98,11 +101,4 @@ export function calculateMonthlyRent(
   }
 
   return monthlyRentRecords;
-}
-
-function getNextMonthDate(date: Date): Date {
-  const nextMonth = new Date(date);
-  nextMonth.setMonth(nextMonth.getMonth() + 1);
-  nextMonth.setDate(1);
-  return nextMonth;
 }
