@@ -12,19 +12,6 @@ export type MonthlyRentRecord = {
 
 export type MonthlyRentRecords = Array<MonthlyRentRecord>;
 
-/**
- * Determines the vacancy, rent amount and due date for each month in a given time window
- *
- * @param baseMonthlyRent : The base or starting monthly rent for unit (Number)
- * @param leaseStartDate : The date that the tenant's lease starts (Date)
- * @param windowStartDate : The first date of the given time window (Date)
- * @param windowEndDate : The last date of the given time window (Date)
- * @param dayOfMonthRentDue : The day of each month on which rent is due (Number)
- * @param rentRateChangeFrequency : The frequency in months the rent is changed (Number)
- * @param rentChangeRate : The rate to increase or decrease rent, input as decimal (not %), positive for increase, negative for decrease (Number),
- * @returns Array<MonthlyRentRecord>;
- */
-
 export function calculateMonthlyRent(
   baseMonthlyRent: number,
   leaseStartDate: Date,
