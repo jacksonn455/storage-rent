@@ -86,3 +86,43 @@ describe("calculateMonthlyRent function", () => {
     expect(result).toEqual(expectedResult);
   });
 });
+
+describe("edge cases", () => {
+  const baseMonthlyRent = 100.0;
+  const leaseStartDate = new Date("2023-02-15T00:00:00");
+  const windowStartDate = new Date("2023-01-01T00:00:00");
+  const windowEndDate = new Date(" 2023-03-31T00:00:00");
+  const dayOfMonthRentDue = 31;
+  const rentRateChangeFrequency = 1;
+  const rentChangeRate = 0.1;
+
+  const result = calculateMonthlyRent(
+    baseMonthlyRent,
+    leaseStartDate,
+    windowStartDate,
+    windowEndDate,
+    dayOfMonthRentDue,
+    rentRateChangeFrequency,
+    rentChangeRate
+  );
+
+  let expectedResult = [
+    {
+      vacancy: true,
+      rentAmount: 100.00,
+      rentDueDate: new Date("2023-01-01T00:00:00"),
+    },
+    {
+      vacancy: false,
+      rentAmount: 100,
+      rentDueDate: new Date("2023-02-15T00:00:00"),
+    },
+    {
+      vacancy: false,
+      rentAmount: 100,
+      rentDueDate: new Date("2023-03-31T00:00:00"),
+    }
+  ];
+
+  expect(result).toEqual(expectedResult);
+});
