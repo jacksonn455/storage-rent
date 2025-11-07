@@ -1,8 +1,9 @@
-import { getRentDueDate } from "./helpers/getRentDueDate";
-import { calculateProRatedRent } from "./helpers/calculateProRatedRent";
-import { calculateRentChange } from "./helpers/calculateRentChange";
-import { formatCurrency } from "./helpers/formatCurrency";
-import { getNextMonthDate } from "./helpers/getNextMonthDate";
+import { RentDueDate } from "./helpers/RentDueDate";
+import { ProRatedRent } from "./helpers/ProRatedRent";
+import { RentChange } from "./helpers/RentChange";
+import { FormatCurrency } from "./helpers/FormatCurrency";
+import { NextMonthDate } from "./helpers/NextMonthDate";
+import { LastDayOfMonth } from "./helpers/LastDayOfMonth";
 
 export type MonthlyRentRecord = {
   vacancy: boolean;
@@ -21,6 +22,7 @@ export function calculateMonthlyRent(
   rentRateChangeFrequency: number,
   rentChangeRate: number
 ) {
+  const rentDueDateHelper = new RentDueDate(new LastDayOfMonth());
   const monthlyRentRecords: MonthlyRentRecords = [];
 
   let currentRent = baseMonthlyRent;
@@ -30,13 +32,12 @@ export function calculateMonthlyRent(
     leaseStartDate.getDate() < dayOfMonthRentDue &&
     leaseStartDate >= windowStartDate
   ) {
-    const firstRentDueDate = getRentDueDate(
+    const firstRentDueDate = rentDueDateHelper.getRentDueDate(
       leaseStartDate.getFullYear(),
       leaseStartDate.getMonth(),
       dayOfMonthRentDue
     );
-
-    const proRatedAmount = calculateProRatedRent(
+    const proRatedAmount = new ProRatedRent().calculateProRatedRent(
       currentRent,
       leaseStartDate,
       firstRentDueDate
@@ -44,7 +45,7 @@ export function calculateMonthlyRent(
 
     monthlyRentRecords.push({
       vacancy: false,
-      rentAmount: formatCurrency(proRatedAmount),
+      rentAmount: new FormatCurrency().getformatCurrency(proRatedAmount),
       rentDueDate: new Date(leaseStartDate),
     });
 
@@ -54,14 +55,14 @@ export function calculateMonthlyRent(
   let currentDate = new Date(windowStartDate);
 
   while (currentDate <= windowEndDate) {
-    const rentDueDate = getRentDueDate(
+    const rentDueDate = rentDueDateHelper.getRentDueDate(
       currentDate.getFullYear(),
       currentDate.getMonth(),
       dayOfMonthRentDue
     );
 
     if (rentDueDate < windowStartDate) {
-      currentDate = getNextMonthDate(currentDate);
+      currentDate = new NextMonthDate().getNextMonthDate(currentDate);
       continue;
     }
 
@@ -79,7 +80,7 @@ export function calculateMonthlyRent(
       monthsSinceLeaseStart % rentRateChangeFrequency === 0 &&
       monthIndex > 0
     ) {
-      currentRent = calculateRentChange(
+      currentRent = new RentChange().calculateRentChange(
         currentRent,
         monthsSinceLeaseStart,
         rentRateChangeFrequency,
@@ -88,7 +89,7 @@ export function calculateMonthlyRent(
       );
     }
 
-    const rentAmount = formatCurrency(currentRent);
+    const rentAmount = new FormatCurrency().getformatCurrency(currentRent);
 
     monthlyRentRecords.push({
       vacancy,
@@ -96,7 +97,7 @@ export function calculateMonthlyRent(
       rentDueDate,
     });
 
-    currentDate = getNextMonthDate(currentDate);
+    currentDate = new NextMonthDate().getNextMonthDate(currentDate);
     monthIndex++;
   }
 
