@@ -5,10 +5,6 @@ export function calculateProRatedRent(
   leaseStartDate: Date,
   rentDueDate: Date
 ): number {
-  const totalDaysInMonth = getLastDayOfMonth(
-    leaseStartDate.getFullYear(),
-    leaseStartDate.getMonth()
-  );
-  const daysUsed = totalDaysInMonth - leaseStartDate.getDate() + 1;
-  return fullRent * (daysUsed / totalDaysInMonth);
+  const daysUsed = rentDueDate.getDate() - leaseStartDate.getDate();
+  return fullRent * (daysUsed / 30);
 }

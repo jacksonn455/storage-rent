@@ -24,8 +24,34 @@ export function calculateMonthlyRent(
   const monthlyRentRecords: MonthlyRentRecords = [];
 
   let currentRent = baseMonthlyRent;
-  let currentDate = new Date(windowStartDate);
   let monthIndex = 0;
+
+  if (
+    leaseStartDate.getDate() < dayOfMonthRentDue &&
+    leaseStartDate >= windowStartDate
+  ) {
+    const firstRentDueDate = getRentDueDate(
+      leaseStartDate.getFullYear(),
+      leaseStartDate.getMonth(),
+      dayOfMonthRentDue
+    );
+
+    const proRatedAmount = calculateProRatedRent(
+      currentRent,
+      leaseStartDate,
+      firstRentDueDate
+    );
+
+    monthlyRentRecords.push({
+      vacancy: false,
+      rentAmount: formatCurrency(proRatedAmount),
+      rentDueDate: new Date(leaseStartDate),
+    });
+
+    monthIndex++;
+  }
+
+  let currentDate = new Date(windowStartDate);
 
   while (currentDate <= windowEndDate) {
     const rentDueDate = getRentDueDate(
@@ -62,20 +88,7 @@ export function calculateMonthlyRent(
       );
     }
 
-    let rentAmount = currentRent;
-    if (
-      !vacancy &&
-      rentDueDate.getMonth() === leaseStartDate.getMonth() &&
-      rentDueDate.getFullYear() === leaseStartDate.getFullYear()
-    ) {
-      rentAmount = calculateProRatedRent(
-        currentRent,
-        leaseStartDate,
-        rentDueDate
-      );
-    }
-
-    rentAmount = formatCurrency(rentAmount);
+    const rentAmount = formatCurrency(currentRent);
 
     monthlyRentRecords.push({
       vacancy,
